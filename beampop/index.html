@@ -1178,6 +1178,7 @@ async function win(chain){
   const svgs=ws.querySelectorAll('svg');for(let k=0;k<3;k++){await sleep(220);svgs[k].classList.add('in');if(k<n){svgs[k].classList.add('on');starSound(k);}}
 }
 function winDaily(chain,n,att){
+  busy=false; // the board is empty now; keep Retry/Hint/Levels working if the daily sheet is closed
   S.stats.dailySolves++;setTimeout(()=>{achSync();scheduleReminders();},50);
   const d=today();S.daily.solved=true;S.daily.chain=chain;S.daily.stars=n;S.daily.taps=att;S.daily.par=B.taps;
   if(S.lastSolved===d-1)S.streak++;else if(S.lastSolved!==d)S.streak=1;
@@ -1484,10 +1485,11 @@ const REMIND_TIMES=['08:00','12:30','19:00'];
 function openRemind(){S.remind.asked=true;save();
   const opts=REMIND_TIMES.map(t=>'<button class="opt'+(S.remind.on&&S.remind.time===t?' on':'')+'" data-t="'+t+'"><span>'+T(t==='08:00'?'Morning':t==='12:30'?'Lunchtime':'Evening')+' <small>'+t+'</small></span>'+(S.remind.on&&S.remind.time===t?'<i class="tick">✓</i>':'')+'</button>').join('');
   $('remindOpts').innerHTML=opts;$('remindNo').textContent=T(S.remind.on?'Turn reminders off':'No thanks');
-  $('remindOpts').querySelectorAll('[data-t]').forEach(b=>b.onclick=async()=>{const ok=await NB.notifyAsk();closeSheets();
+  $('remindOpts').querySelectorAll('[data-t]').forEach(b=>b.onclick=async()=>{const ok=await NB.notifyAsk();afterRemind();
     if(ok){S.remind={on:true,time:b.dataset.t,asked:true};save();scheduleReminders();toast(T('Reminder set for {t}',{t:b.dataset.t}));}
     else toast(T('Notifications are off for Beam Pop. Turn them on in the Settings app.'));});
-  $('remindNo').onclick=()=>{S.remind.on=false;save();scheduleReminders();closeSheets();};
+  $('remindNo').onclick=()=>{S.remind.on=false;save();scheduleReminders();afterRemind();};
+  function afterRemind(){if(mode==='daily'&&S.daily.solved)openDaily();else closeSheets();}
   openSheet('remindSheet');}
 function nextUtcMidnight(){return DAILY_EPOCH+(Math.floor((Date.now()-DAILY_EPOCH)/DAY)+1)*DAY;}
 function scheduleReminders(){if(!(window.NB&&NB.native&&NB.notifySchedule))return;
