@@ -915,7 +915,9 @@ const DIRNAME=['up','right','down','left'];
 const WEB=!!window.WEB_CHALLENGE;
 const PROTO=!!document.getElementById('protoTools'); // testing tools exist only in the web prototype, never in the app // the public challenge web page (no shop, no map, links to the App Store)
 const SITE='https://gamesbradblake.github.io/beampop/', APPLE_URL='https://apps.apple.com/app/id6823288982', PLAY_URL='https://play.google.com/store/apps/details?id=com.bradblake.beampop';
-const ANDROID=/android/i.test(navigator.userAgent||''), STORE_URL=ANDROID?PLAY_URL:APPLE_URL, STORE_LABEL=ANDROID?'Get Beam Pop on Google Play':'Get Beam Pop on the App Store';
+// Set IOS_LIVE to true once Beam Pop is on the App Store; until then everyone is sent to Google Play.
+const IOS_LIVE=false;
+const ANDROID=!IOS_LIVE||/android/i.test(navigator.userAgent||''), STORE_URL=ANDROID?PLAY_URL:APPLE_URL, STORE_LABEL=ANDROID?'Get Beam Pop on Google Play':'Get Beam Pop on the App Store';
 const LB={daily:'beampop.daily',weekly:'beampop.weekly',stars:'beampop.stars'};
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -1614,7 +1616,7 @@ function showVsResult(me,after){const o=VS;VS=null;if(!o)return;const r=vsWinner
   openSheet('vsSheet');if(r>0)confetti();}
 function webPromo(){VS=null;$('vsEyebrow').textContent='Beam Pop';$('vsTitle').textContent=T('Want more?');
   $('vsLine').textContent=T('The app has 150 levels, a new daily puzzle every day and challenges for your friends. It\'s free.');
-  $('vsGrid').innerHTML='';$('vsRow').innerHTML='<a class="btn primary full" href="'+STORE_URL+'" target="_blank" rel="noopener">'+T(STORE_LABEL)+'</a><a class="btn ghost full" href="'+(ANDROID?APPLE_URL:PLAY_URL)+'" target="_blank" rel="noopener">'+T(ANDROID?'Also on the App Store':'Also on Google Play')+'</a>';openSheet('vsSheet');}
+  $('vsGrid').innerHTML='';$('vsRow').innerHTML='<a class="btn primary full" href="'+STORE_URL+'" target="_blank" rel="noopener">'+T(STORE_LABEL)+'</a>'+(IOS_LIVE?'<a class="btn ghost full" href="'+(ANDROID?APPLE_URL:PLAY_URL)+'" target="_blank" rel="noopener">'+T(ANDROID?'Also on the App Store':'Also on Google Play')+'</a>':'');openSheet('vsSheet');}
 
 /* ---------- particles ---------- */
 const fx=$('fx'),ctx=fx.getContext('2d');let parts=[],rafOn=false,dpr=1;
